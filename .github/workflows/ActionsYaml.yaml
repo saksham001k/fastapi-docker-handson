@@ -44,10 +44,19 @@ jobs:
           DOCKERUSERNAME: ${{ secrets.DOCKERUSERNAME }}
           DOCKERTOKEN: ${{ secrets.DOCKERTOKEN }}
         run: |
-          test -n "$DOCKERUSERNAME" && test -n "$DOCKERTOKEN" || { echo 'Add DOCKERUSERNAME and DOCKERTOKEN in repository Actions secrets.'; exit 1; }
+          python - <<'PY'
+          import os, re
+          username = os.environ["DOCKERUSERNAME"].strip()
+          if not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", username):
+              raise SystemExit("DOCKERUSERNAME must contain only your lowercase Docker Hub username.")
+          if not os.environ["DOCKERTOKEN"].strip():
+              raise SystemExit("DOCKERTOKEN is missing.")
+          with open(os.environ["GITHUB_ENV"], "a") as env_file:
+              env_file.write(f"DOCKERHUB_USER={username}\n")
+          PY
       - uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERUSERNAME }}
+          username: ${{ env.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERTOKEN }}
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
@@ -57,5 +66,35 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ secrets.DOCKERUSERNAME }}/fastapi-app:v0.1
-            ${{ secrets.DOCKERUSERNAME }}/fastapi-app:${{ github.sha }}
+            ${{ env.DOCKERHUB_USER }}/fastapi-app:v0.1
+            ${{ env.DOCKERHUB_USER }}/fastapi-app:${{ github.sha }}
+      - name: Pull and check the published image
+        env:
+          IMAGE: ${{ env.DOCKERHUB_USER }}/fastapi-app:${{ github.sha }}
+        run: |
+          docker pull "$IMAGE"
+          docker run -d --name published-api -p 127.0.0.1:8000:8000 "$IMAGE"
+          python - <<'PY'
+          import json, time, urllib.request
+          for attempt in range(30):
+              try:
+                  with urllib.request.urlopen("http://localhost:8000/health", timeout=2) as response:
+                      assert json.load(response) == {"status": "healthy"}
+                  break
+              except Exception:
+                  if attempt == 29:
+                      raise
+                  time.sleep(1)
+          with urllib.request.urlopen("http://localhost:8000/") as response:
+              data = json.load(response)
+              assert data["sap_id"] == "590015169"
+              assert data["location"] == "Dehradun"
+          with urllib.request.urlopen("http://localhost:8000/students") as response:
+              assert len(json.load(response)) == 2
+          print("Published image: health, student list, SAP ID and location verified.")
+          PY
+      - name: Published container logs and cleanup
+        if: always()
+        run: |
+          docker logs published-api || true
+          docker rm -f published-api || true
