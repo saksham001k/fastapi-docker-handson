@@ -4,6 +4,15 @@ Saksham Katiyar · SAP ID: 590015169
 
 Unit 4: containerize a small Student API, publish it to Docker Hub, observe requests and run two instances behind Nginx.
 
+## Coursework links
+
+- [Main Backend Development repository](https://github.com/saksham001k/Backend-Development-)
+- [Unit 4 reference](https://github.com/saksham001k/Backend-Development-/blob/main/Theory/Unit4/README.md)
+- [Course website](https://saksham001k.github.io/Backend-Development-/#unit4)
+- [Personal coursework portal](https://saksham001k.github.io/#unit4)
+
+This separate repository contains the project code. The course repository and portals link here.
+
 ## Files
 
 | File | Purpose |
@@ -120,6 +129,8 @@ Verified on 17 November 2026 in [GitHub Actions run #2](https://github.com/saksh
 | Twenty requests through Nginx | Passed; both upstream instances received requests |
 | Docker Hub publishing | Passed for linux/amd64 and linux/arm64; v0.1 and commit tags pushed |
 | Pull and run the published image | Passed in Actions; health, student list, SAP ID and Dehradun verified |
+
+Local verification on my Mac on 17 November 2026 also confirmed both healthy API containers, Nginx, root/student/health/docs responses and requests reaching both upstreams. `docker compose down` stopped the stack successfully.
 
 The full workflow passed. Docker Hub credentials are stored in Actions secrets. The workflow trims surrounding whitespace from the username before using it in image tags. Use the pull/run commands above to run the published image on your Mac.
 
