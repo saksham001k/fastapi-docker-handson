@@ -110,6 +110,17 @@ For a separate source-change demonstration, change a visible value in `home()`, 
 
 ## Validation status
 
-Local Python API tests have been run. Docker build, load balancing, Docker Hub publishing and GitHub Actions must be verified on a Docker-capable machine or the repository's Actions runner. They are not claimed as completed executions in this copy.
+Verified on 17 November 2026 in [GitHub Actions run #1](https://github.com/saksham001k/fastapi-docker-handson/actions/runs/44056397908):
+
+| Check | Result |
+| --- | --- |
+| Five API tests | Passed locally and in Actions |
+| Docker image build | Passed in Actions |
+| Two healthy API containers and Nginx startup | Passed in Actions |
+| Twenty requests through Nginx | Passed; both upstream instances received requests |
+| Docker Hub publishing | Blocked: one or both required Actions secrets are missing |
+| Pull and run the published image / source-update demonstration | Pending successful publishing |
+
+Add `DOCKERUSERNAME` and `DOCKERTOKEN` using the setup above. Then open the failed run in Actions and choose **Re-run all jobs**. After it succeeds, use the pull/run commands above on your Mac.
 
 Tutorial: https://upessocs.github.io/#d=/Lectures/Backend%20Development/Theory/Unit%204/&f=Hands%20On%20Task.md
