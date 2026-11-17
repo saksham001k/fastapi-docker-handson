@@ -110,7 +110,7 @@ For a separate source-change demonstration, change a visible value in `home()`, 
 
 ## Validation status
 
-Verified on 17 November 2026 in [GitHub Actions run #1](https://github.com/saksham001k/fastapi-docker-handson/actions/runs/44056397908):
+Verified on 17 November 2026 in [GitHub Actions run #2](https://github.com/saksham001k/fastapi-docker-handson/actions/runs/44060310292):
 
 | Check | Result |
 | --- | --- |
@@ -118,9 +118,9 @@ Verified on 17 November 2026 in [GitHub Actions run #1](https://github.com/saksh
 | Docker image build | Passed in Actions |
 | Two healthy API containers and Nginx startup | Passed in Actions |
 | Twenty requests through Nginx | Passed; both upstream instances received requests |
-| Docker Hub publishing | Blocked: one or both required Actions secrets are missing |
-| Pull and run the published image / source-update demonstration | Pending successful publishing |
+| Docker Hub publishing | Passed for linux/amd64 and linux/arm64; v0.1 and commit tags pushed |
+| Pull and run the published image | Passed in Actions; health, student list, SAP ID and Dehradun verified |
 
-Add `DOCKERUSERNAME` and `DOCKERTOKEN` using the setup above. Then open the failed run in Actions and choose **Re-run all jobs**. After it succeeds, use the pull/run commands above on your Mac.
+The full workflow passed. Docker Hub credentials are stored in Actions secrets. The workflow trims surrounding whitespace from the username before using it in image tags. Use the pull/run commands above to run the published image on your Mac.
 
 Tutorial: https://upessocs.github.io/#d=/Lectures/Backend%20Development/Theory/Unit%204/&f=Hands%20On%20Task.md
