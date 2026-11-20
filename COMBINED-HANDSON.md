@@ -30,4 +30,8 @@ GitHub Actions runs the existing unit tests and the live HTTP suite before publi
 
 For manual Docker build, push and pull commands, see the [main README](README.md). Logs show the method, path, status, and duration. Use latency and error rates to decide whether to investigate a bottleneck or scale.
 
+## Verified result
+
+[GitHub Actions run](https://github.com/saksham001k/fastapi-docker-handson/actions/runs/44730531624): 5 unit checks and 6 live HTTP checks passed, Nginx sent traffic to both instances, and images for AMD64 and ARM64 were published to Docker Hub. The runner pulled and ran the updated image and passed the live suite again.
+
 [Course brief](https://upessocs.github.io/#d=/Lectures/Backend%20Development/Theory/Unit%204/&f=001%20Combined%20Hands%20On%20Task.md)
