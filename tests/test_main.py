@@ -20,7 +20,7 @@ class StudentApiTests(unittest.TestCase):
     def test_students(self):
         response = self.client.get("/students")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([student["id"] for student in response.json()], [1, 2])
+        self.assertEqual([student["id"] for student in response.json()], [1, 2, 3])
 
     def test_unknown_route(self):
         self.assertEqual(self.client.get("/missing").status_code, 404)

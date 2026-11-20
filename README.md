@@ -25,7 +25,7 @@ This separate repository contains the project code. The course repository and po
 | `.github/workflows/ActionsYaml.yaml` | Test, build and publish on push to main |
 | `tests/test_main.py` | API response and logging checks |
 
-The student list is sample data in Python, not a database. No CRUD, login or extra application features are added.
+The Combined Hands-on PBL reuses the [Unit 1 Task 3 Student Management API](https://github.com/saksham001k/Backend-Development-/tree/main/Theory/Task3). See [Combined Hands-on](COMBINED-HANDSON.md) for the route tests and updated image checks.
 
 ## Run without Docker
 
@@ -94,7 +94,7 @@ Open http://localhost:8080/students. Nginx sends requests to `fastapi-1` and `fa
 
 ## Verify the published update
 
-The root response includes SAP ID `590015169` and location `Dehradun`, the tutorial's visible update. After a successful workflow run, pull and run the published image:
+The updated root response includes SAP ID `590015169`, location `Dehradun`, and the marker `demo: unit4-combined-task3`. After a successful workflow run, pull and run the published image:
 
 ```bash
 docker compose down
@@ -105,7 +105,7 @@ docker logs fastapi-app
 docker rm -f fastapi-app
 ```
 
-For a separate source-change demonstration, change a visible value in `home()`, commit and push, wait for Actions, and repeat these pull/run commands. A source change affects a container only after rebuilding its image and recreating the container.
+For a future source-change demonstration, update the marker in `read_root()` and its assertion in `automationTesting.py`, commit and push, wait for Actions, and repeat these pull/run commands. A source change affects a container only after rebuilding its image and recreating the container.
 
 ## How it works
 
@@ -117,7 +117,7 @@ For a separate source-change demonstration, change a visible value in `home()`, 
 6. GitHub Actions runs the checks and publishes updated images.
 7. Nginx distributes requests between two running copies of the API.
 
-## Validation status
+## Original Docker demo verification
 
 Verified on 17 November 2026 in [GitHub Actions run #2](https://github.com/saksham001k/fastapi-docker-handson/actions/runs/44060310292):
 

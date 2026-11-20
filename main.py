@@ -1,16 +1,37 @@
 import logging
 import time
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Query, Request
+from pydantic import BaseModel
+from typing import Optional, List
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("student-api")
-app = FastAPI(title="Student API")
 
-students = [
-    {"id": 1, "name": "Aarav", "course": "Backend Development"},
-    {"id": 2, "name": "Diya", "course": "Backend Development"},
+app = FastAPI(
+    title="Student Management API",
+    version="1.0.0"
+)
+
+
+class Student(BaseModel):
+    id: int
+    name: str
+    branch: str
+
+
+class StudentCreate(BaseModel):
+    name: str
+    branch: str
+
+
+students: List[Student] = [
+    Student(id=1, name="Aarav", branch="CSE"),
+    Student(id=2, name="Diya", branch="ECE"),
+    Student(id=3, name="Rohan", branch="IT"),
 ]
+
+next_id = 4
 
 
 @app.middleware("http")
@@ -29,9 +50,17 @@ async def log_requests(request: Request, call_next):
 
 
 @app.get("/")
-def home():
-    return {"application": "Student API", "framework": "FastAPI", "status": "running",
-            "name": "Saksham Katiyar", "sap_id": "590015169", "location": "Dehradun"}
+def read_root():
+    return {
+        "message": "Student Management API is running",
+        "application": "Student API",
+        "framework": "FastAPI",
+        "status": "running",
+        "name": "Saksham Katiyar",
+        "sap_id": "590015169",
+        "location": "Dehradun",
+        "demo": "unit4-combined-task3",
+    }
 
 
 @app.get("/health")
@@ -39,6 +68,83 @@ def health():
     return {"status": "healthy"}
 
 
-@app.get("/students")
-def get_students():
+@app.get("/students", response_model=List[Student])
+def list_students(branch: Optional[str] = Query(None)):
+    if branch:
+        return [
+            s for s in students
+            if s.branch.upper() == branch.upper()
+        ]
     return students
+
+
+@app.get("/students/{student_id}", response_model=Student)
+def get_student(student_id: int):
+    for student in students:
+        if student.id == student_id:
+            return student
+
+    raise HTTPException(
+        status_code=404,
+        detail="Student not found"
+    )
+
+
+@app.post(
+    "/students",
+    response_model=Student,
+    status_code=201
+)
+def create_student(student: StudentCreate):
+    global next_id
+
+    new_student = Student(
+        id=next_id,
+        **student.model_dump()
+    )
+
+    students.append(new_student)
+    next_id += 1
+
+    return new_student
+
+
+@app.put(
+    "/students/{student_id}",
+    response_model=Student
+)
+def update_student(
+    student_id: int,
+    student: StudentCreate
+):
+    for i, existing in enumerate(students):
+        if existing.id == student_id:
+            updated = Student(
+                id=student_id,
+                **student.model_dump()
+            )
+
+            students[i] = updated
+            return updated
+
+    raise HTTPException(
+        status_code=404,
+        detail="Student not found"
+    )
+
+
+@app.delete(
+    "/students/{student_id}",
+    status_code=204
+)
+def delete_student(student_id: int):
+    for i, student in enumerate(students):
+        if student.id == student_id:
+            students.pop(i)
+            return
+
+    raise HTTPException(
+        status_code=404,
+        detail="Student not found"
+    )
+

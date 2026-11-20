@@ -18,13 +18,15 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - name: Build and run two API instances with Nginx
         run: docker compose up -d --build --wait
+      - name: Test all application routes on one instance
+        run: BASE_URL=http://127.0.0.1:8001 python automationTesting.py
       - name: Check load-balanced responses
         run: |
           python - <<'PY'
           import json, urllib.request
           for _ in range(20):
               with urllib.request.urlopen('http://localhost:8080/students', timeout=5) as response:
-                  assert len(json.load(response)) == 2
+                  assert len(json.load(response)) == 3
           PY
           docker compose logs nginx
           test "$(docker compose logs nginx | sed -n 's/.*upstream=\([^ ]*\).*/\1/p' | sort -u | wc -l)" -ge 2
@@ -90,9 +92,9 @@ jobs:
               assert data["sap_id"] == "590015169"
               assert data["location"] == "Dehradun"
           with urllib.request.urlopen("http://localhost:8000/students") as response:
-              assert len(json.load(response)) == 2
-          print("Published image: health, student list, SAP ID and location verified.")
+              assert len(json.load(response)) == 3
           PY
+          python automationTesting.py
       - name: Published container logs and cleanup
         if: always()
         run: |
